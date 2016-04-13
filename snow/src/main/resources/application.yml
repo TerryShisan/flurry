@@ -1,0 +1,12 @@
+kafka:
+  broker:
+    address: 10.160.5.56:9092
+  zookeeper:
+    connect: 10.160.5.56:2181
+  topic: "test"
+  messageKey:
+zookeeper:
+  host: 10.160.5.56
+  port: 2181
+mq:
+  enabled: true
