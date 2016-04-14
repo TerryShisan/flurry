@@ -9,8 +9,11 @@
         <artifactId>flurry</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-
     <groupId>org.mine</groupId>
     <artifactId>rain</artifactId>
     <packaging>pom</packaging>
+    <modules>
+        <module>byte2string-transformer</module>
+        <module>find-list-processor</module>
+    </modules>
 </project>
