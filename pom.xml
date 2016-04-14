@@ -13,7 +13,7 @@
     <module>common</module>
     <module>snow</module>
     <module>rain/find-list-processor</module>
-    <module>rain/byte2string-processor</module>
+    <module>rain/byte2string-transformer</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
