@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>org.mine</groupId>
-    <artifactId>rain</artifactId>
+    <artifactId>find-list-processor</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
