@@ -10,3 +10,6 @@ zookeeper:
   port: 2181
 mq:
   enabled: true
+cassandra:
+  address: 10.160.5.56
+  port: 9042

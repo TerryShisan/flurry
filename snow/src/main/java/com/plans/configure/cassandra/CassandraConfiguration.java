@@ -1,5 +1,6 @@
 package com.plans.configure.cassandra;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.config.CassandraClusterFactoryBean;
@@ -14,12 +15,18 @@ import org.springframework.data.cassandra.mapping.CassandraMappingContext;
 @Configuration
 public class CassandraConfiguration extends AbstractCassandraConfiguration {
 
+    @Value("${cassandra.address}")
+    private String cassandraAddress;
+
+    @Value("${cassandra.port}")
+    private Integer cassandraPort;
+
     @Bean
     @Override
     public CassandraClusterFactoryBean cluster() {
         CassandraClusterFactoryBean cluster = new CassandraClusterFactoryBean();
-        cluster.setContactPoints("10.160.5.56");
-        cluster.setPort(9042);
+        cluster.setContactPoints(cassandraAddress);
+        cluster.setPort(cassandraPort);
         return cluster;
     }
 
