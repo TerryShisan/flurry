@@ -12,7 +12,8 @@
     <modules>
     <module>common</module>
     <module>snow</module>
-    <module>rain</module>
+    <module>rain/find-list-processor</module>
+    <module>rain/byte2string-processor</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
