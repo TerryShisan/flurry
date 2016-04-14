@@ -6,12 +6,9 @@ import org.springframework.xd.module.options.spi.ProfileNamesProvider;
 
 import javax.validation.constraints.AssertTrue;
 
-
 public class OptionsMeta   {
-
     private  String blackName="";
     private  String listFileName="";
-
 
     private String moduleExecutionFramework = "spark";
     private String batchInterval;

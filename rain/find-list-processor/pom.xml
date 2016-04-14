@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>org.mine</groupId>
-        <artifactId>flurry</artifactId>
+        <artifactId>rain</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
