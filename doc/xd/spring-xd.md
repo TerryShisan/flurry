@@ -3,18 +3,17 @@ spring-xd
 
 ## 安装spring-xd
 
-对于OSX用户，如果还没有Homebrew的话，请安装，然后运行：
+**OSX** 用户，使用```Homebrew```安装：
+```
+brew tap pivotal/tap
+brew install springxd
+```    
 
-    brew tap pivotal/tap
-    brew install springxd
+想要安装更新的版本，那么使用```brew upgrade springXD```就可以。
 
-spring-xd会安装到 /usr/local/Cellar/springxd/1.0.0.M7/libexec （依赖于Spring XD的库）。
+**红帽或者CentOS** 用户可以使用Yum来安装。
 
-注意：如果你随后想要安装更新的版本，那么使用brew upgrade springXD就可以。
-
-红帽或者CentOS的用户可以使用Yum来安装。
-
-Windows用户可以下载最新的.zip文件，解压，安装到文件夹，然后把XD_HOME这个环境变量设置成安装文件夹。
+**Windows** 用户可以下载最新的.zip文件，解压，安装到文件夹，然后把XD_HOME这个环境变量设置成安装文件夹。
 
 ## 使用说明
 
@@ -41,7 +40,7 @@ admin config server http://localhost:9393
 ~~~
 
 如果本地在配置kafka的时候已经启动了zookeeper，所以这里需要把zookeeper的地址修改为实际的地址。修改下面的文件即可：
- 
+
 >~~~    
 xd/config/servers.yml:
 #Zookeeper properties
@@ -51,21 +50,24 @@ zk:
     connect: localhost:2181
 ~~~
 
-## kafka作为Sink
+### kafka作为Sink
 
 ~~~
 xd:>stream create push-to-kafka --definition "http | kafka --topic=myTopic" --deploy
+
 xd:>Created and deployed new stream 'push-to-kafka'
+
 xd:>http post --data "push-messages"
 > POST (text/plain;Charset=UTF-8) http://localhost:9000 push-messages
 > 200 OK
 ~~~
 
-## kafka作为Source
+### kafka作为Source
 
 Configure a stream that has kafka source with a single topic:
 
     xd:> stream create myKafkaSource1 --definition "kafka --zkconnect=localhost:2181 --topic=mytopic | log" --deploy
+
 Configure a stream that has kafka source with a multiple topics:
 
     xd:> stream create myKafkaSource2 --definition "kafka --zkconnect=localhost:2181 --topics=mytopic1,mytopic2 | log" --deploy
@@ -104,7 +106,7 @@ Configure a stream that has kafka source with a multiple topics:
 正是kafka topic=test中的内容，不过这里不是字符串的形式，而是用ascii码来表示了，看来确实kafka作为source是可行的，只是输出的内容格式需要关注。
 
 
-## cassandra作为sink
+### cassandra作为sink
 spring xd中已经把cassandra单独作为一个sink的module，所以可以不用jdbc的方式来搞。下面创建和发送数据的过程如下：
 
 ~~~
@@ -131,7 +133,7 @@ user_id | fname | lname
 
 ***每个http source都要占用一个web 端口，默认是9000。多个流的话要为不同的流绑定不同的web 端口***
 
-## kafka作为source, spark-stream作为processor, cassandra作为sink
+### kafka作为source, spark-stream作为processor, cassandra作为sink
 从上面的过程中可以看出，单独的过程都已经可以打通，将数据格式做一些转换，正好可以实验一下processor的工作方式。我们通过一个processor来把kafka的输入转换之后输出到cassandra.
 
 因为kafka作为source的时候输出的不是字符串，是二进制数据，所以不能简单地用shell, **shell要求输入和输出都是String**。
@@ -191,4 +193,3 @@ cqlsh:mykeyspace> select * from journey;
 (2 rows)
 
 ~~~
-

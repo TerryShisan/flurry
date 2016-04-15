@@ -6,11 +6,10 @@ Kafka
 在kafka启动的时候要同时启动zookeeper和kafka server
 
 命令如下：
-
-bin/kafka-server-start.sh config/server.properties
-
+```
 bin/zookeeper-server-start.sh config/zookeeper.properties
-
+bin/kafka-server-start.sh config/server.properties
+```
 具体配置可以修改server.properties和zookeeper.properties.
 
 如果出现下面的错误，则是因为没有启动kafka server.

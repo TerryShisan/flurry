@@ -1,4 +1,4 @@
-package com.plans.bean;
+package com.plans.entity;
 
 /**
  * Created by river on 2016/3/24.

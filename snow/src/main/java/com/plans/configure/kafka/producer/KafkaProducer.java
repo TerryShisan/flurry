@@ -27,5 +27,4 @@ public class KafkaProducer implements MqSend {
 		logger.info("发送消息:{}",message);
 		toKafka.send(new GenericMessage<>(message));
 	}
-	
 }

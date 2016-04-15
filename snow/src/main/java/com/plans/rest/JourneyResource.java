@@ -3,7 +3,7 @@ package com.plans.rest;
 import com.plans.common.BaseResult;
 import com.plans.common.ResultCode;
 import com.plans.configure.MqSend;
-import com.plans.bean.Customer;
+import com.plans.entity.Customer;
 import com.plans.dao.CustomerRepository;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Component
 @Path("/journey")
-public class Journey{
+public class JourneyResource {
     @Autowired
     @Qualifier("kafkaProducer")
     MqSend mqSend;

@@ -14,7 +14,7 @@ import org.springframework.data.cassandra.mapping.CassandraMappingContext;
 
 @Configuration
 public class CassandraConfiguration extends AbstractCassandraConfiguration {
-
+    public static final String KEY_SPACE = "mykeyspace";
     @Value("${cassandra.address}")
     private String cassandraAddress;
 
@@ -32,7 +32,7 @@ public class CassandraConfiguration extends AbstractCassandraConfiguration {
 
     @Override
     protected String getKeyspaceName() {
-        return "mykeyspace";
+        return KEY_SPACE;
     }
 
     @Bean
@@ -40,5 +40,4 @@ public class CassandraConfiguration extends AbstractCassandraConfiguration {
     public CassandraMappingContext cassandraMapping() throws  ClassNotFoundException {
         return new BasicCassandraMappingContext();
     }
-
 }

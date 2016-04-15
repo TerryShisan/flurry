@@ -6,7 +6,7 @@ package com.plans.dao;
 
 import java.util.List;
 
-import com.plans.bean.Customer;
+import com.plans.entity.Customer;
 import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
