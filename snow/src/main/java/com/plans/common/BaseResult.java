@@ -6,11 +6,11 @@ public class BaseResult implements Serializable {
 
     private static final long serialVersionUID = -7970980981956108271L;
 
-    private int               code;
-    private String            message;
-    private boolean           success;
+    private int code;
+    private String message;
+    private boolean success;
 
-    public BaseResult(){
+    public BaseResult() {
         this.code = ResultCode.SUCCESS.code;
         this.message = ResultCode.SUCCESS.message;
         this.success = ResultCode.SUCCESS.success;

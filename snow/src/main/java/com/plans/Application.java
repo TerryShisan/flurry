@@ -3,6 +3,7 @@ package com.plans;
 /**
  * Created by river on 2016/3/24.
  */
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;

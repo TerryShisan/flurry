@@ -14,12 +14,11 @@
  */
 package my.custom.transformer;
 
-import java.util.Arrays;
-
 import org.codehaus.jackson.map.ObjectMapper;
-
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.Transformer;
+
+import java.util.Arrays;
 
 
 /**
@@ -27,11 +26,11 @@ import org.springframework.integration.annotation.Transformer;
  */
 @MessageEndpoint
 public class Byte2StringTransformer {
-	private ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
 
-	@Transformer(inputChannel = "input", outputChannel = "output")
-	public String transform(byte[] payload) {
-		System.out.println(Arrays.toString(payload));
-		return new String(payload);
-	}
+    @Transformer(inputChannel = "input", outputChannel = "output")
+    public String transform(byte[] payload) {
+        System.out.println(Arrays.toString(payload));
+        return new String(payload);
+    }
 }

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
  * Created by river on 2016/4/2.
  */
 @Component
-public class JerseyConfig extends ResourceConfig{
-    public JerseyConfig(){
+public class JerseyConfig extends ResourceConfig {
+    public JerseyConfig() {
         register(JourneyResource.class);
     }
 }

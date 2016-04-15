@@ -3,12 +3,13 @@ package com.plans.entity;
 /**
  * Created by river on 2016/3/24.
  */
+
 import org.springframework.data.cassandra.mapping.Column;
 import org.springframework.data.cassandra.mapping.PrimaryKey;
 import org.springframework.data.cassandra.mapping.Table;
 
 @Table
-public class Customer{
+public class Customer {
 
     @PrimaryKey
     private final String name;

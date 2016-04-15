@@ -8,7 +8,6 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.mine</groupId>
     <artifactId>byte2string-transformer</artifactId>
     <name>Flurry Transformer</name>
     <packaging>jar</packaging>

@@ -3,8 +3,8 @@ package com.plans.rest;
 import com.plans.common.BaseResult;
 import com.plans.common.ResultCode;
 import com.plans.configure.MqSend;
-import com.plans.entity.Customer;
 import com.plans.dao.CustomerRepository;
+import com.plans.entity.Customer;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +28,23 @@ public class JourneyResource {
     CustomerRepository journeyDao;
 
     @POST
-    @Consumes({ MediaType.APPLICATION_JSON})
-    @Produces({ MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
     //ToDo 因为尝试用JSON的方式接收POST请求带过来的数据失败，这里用String类型的变量接收消息
-    public BaseResult addJourney(String plane)throws JSONException{
+    public BaseResult addJourney(String plane) throws JSONException {
         BaseResult result = new BaseResult();
-        JSONObject json= new JSONObject(plane);
+        JSONObject json = new JSONObject(plane);
         System.out.println(json.toString());
-        if (json.has("type")== false|| ((String)json.get("type")).equals("")){
+        if (!json.has("type") || json.get("type").equals("")) {
             result.setError(ResultCode.ILLEGAL_PARAM, "type must exist", "type", "");
             return result;
         }
-        if (json.has("name")== false || ((String)json.get("name")).equals("")){
-            result.setError(ResultCode.ILLEGAL_PARAM, "name must exist", "name","");
+        if (!json.has("name") || json.get("name").equals("")) {
+            result.setError(ResultCode.ILLEGAL_PARAM, "name must exist", "name", "");
             return result;
         }
-        if (json.has("date")== false|| ((String)json.get("date")).equals("")){
-            result.setError(ResultCode.ILLEGAL_PARAM, "date must exist", "date","");
+        if (!json.has("date") || json.get("date").equals("")) {
+            result.setError(ResultCode.ILLEGAL_PARAM, "date must exist", "date", "");
             return result;
         }
 
@@ -58,8 +58,8 @@ public class JourneyResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<Customer> GetJourneys(@QueryParam("type") String type,
-                                @QueryParam("name") String name,
-                                @QueryParam("date") String date){
+                                      @QueryParam("name") String name,
+                                      @QueryParam("date") String date) {
         List<Customer> journey = journeyDao.findAllJourneys();
         return journey;
     }

@@ -2,15 +2,14 @@ package org.mine.findblacklist;
 
 import org.apache.spark.storage.StorageLevel;
 import org.springframework.xd.module.options.spi.ModuleOption;
-import org.springframework.xd.module.options.spi.ProfileNamesProvider;
 
 import javax.validation.constraints.AssertTrue;
 
-public class OptionsMeta   {
-    private  String blackName="";
-    private  String listFileName="";
+public class OptionsMeta {
+    private String blackName = "";
+    private String listFileName = "";
 
-    private String moduleExecutionFramework = "spark";
+    private static final String moduleExecutionFramework = "spark";
     private String batchInterval;
     private String storageLevel = "";
     private boolean enableTap = false;
@@ -40,7 +39,7 @@ public class OptionsMeta   {
             message = "Use a valid storage level option. See org.apache.spark.storage.StorageLevel"
     )
     public boolean isSparkStorageValid() {
-        if(this.storageLevel.length() == 0) {
+        if (this.storageLevel.length() == 0) {
             return true;
         } else {
             try {
@@ -66,7 +65,7 @@ public class OptionsMeta   {
             hidden = true
     )
     public String getModuleExecutionFramework() {
-        return this.moduleExecutionFramework;
+        return moduleExecutionFramework;
     }
 
     public String getBlackName() {

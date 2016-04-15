@@ -11,20 +11,21 @@ import org.springframework.stereotype.Component;
 
 /**
  * kafka启动
+ *
  * @author river 20160405
  */
 @Component("kafkaProducer")
 public class KafkaProducer implements MqSend {
-	
-	Logger logger = LoggerFactory.getLogger(this.getClass());  
-	
-	@Autowired
-	@Qualifier("toKafka")
-	public MessageChannel toKafka;
-	
-	@Override
-	public void send(String message) {
-		logger.info("发送消息:{}",message);
-		toKafka.send(new GenericMessage<>(message));
-	}
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    @Qualifier("toKafka")
+    public MessageChannel toKafka;
+
+    @Override
+    public void send(String message) {
+        logger.info("发送消息:{}", message);
+        toKafka.send(new GenericMessage<>(message));
+    }
 }

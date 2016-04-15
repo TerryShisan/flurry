@@ -27,17 +27,18 @@ import org.springframework.messaging.MessageChannel;
 @Configuration
 @EnableIntegration
 public class ModuleConfiguration {
-	@Bean
-	MessageChannel input() {
-		return new DirectChannel();
-	}
-	@Bean
-	MessageChannel output() {
-		return new DirectChannel();
-	}
+    @Bean
+    MessageChannel input() {
+        return new DirectChannel();
+    }
 
-	@Bean
-	Byte2StringTransformer transformer() {
-		return new Byte2StringTransformer();
-	}
+    @Bean
+    MessageChannel output() {
+        return new DirectChannel();
+    }
+
+    @Bean
+    Byte2StringTransformer transformer() {
+        return new Byte2StringTransformer();
+    }
 }

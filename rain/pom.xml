@@ -9,7 +9,6 @@
         <artifactId>flurry</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <groupId>org.mine</groupId>
     <artifactId>rain</artifactId>
     <packaging>pom</packaging>
     <modules>
