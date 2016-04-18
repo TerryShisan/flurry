@@ -7,13 +7,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.xd.spark.streaming.SparkConfig;
 import org.springframework.xd.spark.streaming.java.Processor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @SuppressWarnings({"serial"})
 public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream<String>> {
@@ -34,7 +37,7 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
      * 返回值为false时过滤
      */
     public JavaDStream<String> process(JavaDStream<String> input) {
-        List<String> list = getBlackListByNames();
+        List<String> list = getBlackList();
         JavaDStream<String> ret = input.filter((Function<String, Boolean>) s -> {
             boolean isBlack = false;
             for (int i = 0; i < list.size(); i++) {
@@ -49,7 +52,7 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
         return ret;
     }
 
-    public List<String> getBlackListByNames() {
+    public List<String> getBlackList() {
         List<String> listAllName = new ArrayList<>();
 
         /**
@@ -66,24 +69,25 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
         /**
          * 解析参数中文件的黑名单
          */
-        List<String> listByFile = getBlackListByFile();
+        List<String> listByFile = getBlackListByFileName();
         if (listByFile != null) {
             listAllName.addAll(listByFile);
         }
-        System.out.println("3" + listAllName);
         return listAllName;
     }
 
-    private List<String> getBlackListByFile() {
-        File file = new File(blackFileName);
+
+
+    private List<String> getBlackListByFileName() {
         List<String> list = null;
-        byte[] content = new byte[((Long) file.length()).intValue()];
+        Path path = Paths.get(blackFileName);
         try {
-            FileInputStream in = new FileInputStream(file);
-            in.read(content);
-            in.close();
+            BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+            char[] content = new char[(int) Files.size(path)];
+            reader.read(content);
             String con = new String(content);
             list = Arrays.asList(con.replace("\r", "").split("\n"));
+            reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
