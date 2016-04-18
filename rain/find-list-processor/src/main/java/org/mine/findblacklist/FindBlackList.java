@@ -87,6 +87,7 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
             reader.read(content);
             String con = new String(content);
             list = Arrays.asList(con.replace("\r", "").split("\n"));
+            reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
