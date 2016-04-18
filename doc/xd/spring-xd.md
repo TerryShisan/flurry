@@ -193,3 +193,41 @@ cqlsh:mykeyspace> select * from journey;
 (2 rows)
 
 ~~~
+
+##### 性能测试
+使用python脚本测试基于本场景进行性能测试。提交10000条请求，测试请求的处理时间。
+Snow部署在一台PC上，提交请求的脚本在相同的PC上运行，Spring xd运行在同局域网中的另外一台Mac book air上，kafka和cassandra运行在同一台Mac book air上。
+
+**测试脚本**
+
+~~~
+#!/usr/local/bin/python
+# coding:utf-8
+
+import json
+import requests
+import time
+
+if __name__ == '__main__':
+    url = 'http://localhost:8080/journey'
+    headers = {'content-type': 'application/json'}
+    payload3 = {'airport': '\xca\xd7\xb6\xbc\xbb\xfa\xb3\xa1', 'contact': '888888', 'depart': 'hangzhou', 'name': 'zhangsan', \
+                'credentials': '\xc9\xed\xb7\xdd\xd6\xa4', 'date': '20160408', 'flight': 'CA1986', 'type': 'plane', 'credentials_no': '1234567', 'seat': '15F'}
+    i = 0;
+    print time.time()
+    for i in range(0,10000,1):
+        payload3['name']= 'zhangsan'+str(i)
+        r = requests.post(url, data=json.dumps(payload3, encoding='gb2312'), headers=headers)
+    print time.time()
+~~~
+
+**测试结果**
+
+~~~
+1460973288.54
+1460973333.23
+
+Process finished with exit code 0
+~~~
+
+10000条请求从提交到处理完成，并最终存入cassandra，共耗时45秒。
