@@ -58,11 +58,17 @@ spring-xd通过stream的形式来组织source/processor/sink,其中source和sink
 
 命令如下：
 
-~~~
-xd:>module upload --file /Users/bj-yf/zhouhb/jar/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
+```
+xd:>module upload --file /opt/flurry/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
 Successfully uploaded module 'processor:find-list'
-xd:>module upload --file /Users/bj-yf/zhouhb/jar/byte2string-transformer-1.0-SNAPSHOT.jar --type processor --name byte2string
+```
+
+```
+xd:>module upload --file /opt/flurry/byte2string-transformer-1.0-SNAPSHOT.jar --type processor --name byte2string
 Successfully uploaded module 'processor:byte2string'
+```
+
+```
 xd:>module list
       Source              Processor            Sink                     Job
   ------------------  -------------------  -----------------------  -----------------
@@ -93,7 +99,8 @@ xd:>module list
                                                splunk
                                                tcp
                                                throughput-sampler
-~~~
+```
+
 **创建stream**
 
 将rain中的jar包添加为module之后，接着就可以创建stream了，这里我们要创建的steam的目的是从kafka中读取消息，然后送到spark-streaming中进行过滤，并将过滤结果放到cassandra数据库中的journey表中。
@@ -101,7 +108,7 @@ xd:>module list
 创建流的命令如下：
 
 ~~~
-xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=localhost" --deploy
+xd:>stream create test --definition "kafka --zkconnect=10.160.5.56:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=10.160.5.56" --deploy
 Created and deployed new stream 'test'
 ~~~
 
@@ -123,7 +130,7 @@ kafka:
   topic: "test"
   messageKey:
 zookeeper:
-  host: localhost 
+  host: localhost
   port: 2181
 cassandra:
   address: localhost
@@ -199,19 +206,19 @@ cassandra:
     count:  20,             //本次获取的数量
     list:[
       {
-          "name":  "张三",               //必选，姓名
-          "type": "plane",              //必选，行程的类型
-          "date":  "20160411",          //必选，日期
-          "credentials":  "身份证"，     //证件类型
-          "credential_no"："1234567",         //证件号码
-          "contact":"888888",        //联系方式
-          "flight": "CA1986",        //航班号
-          "depart":  "beijing",       //出发地
-          "dest":  "hangzhou",         //目的地
-          "seat": "15F",             //座位号
-          "airport":"首都机场"        //机场信息，飞机才有的信息
-          "carriage": "",           //车厢号，火车才有的信息
-          "station":""              //乘车车站，火车才有的信息
+        "name":  "张三",            //姓名
+        "type": "plane",           //行程的类型
+        "id":  "身份证"，           //证件类型
+        "idno"："1234567",         //证件号码
+        "contact":"888888",        //联系方式
+        "date":  "20160411",     //日期
+        "flight": "CA1986",        //航班号
+        "depart":  "beijing",       //出发地
+        "dest":  "hangzhou",         //目的地
+        "seat": "15F",             //座位号
+        "airport":"首都机场"        //机场信息，飞机才有的信息
+        "carriage": "",           //车厢号，火车才有的信息
+        "station":""              //乘车车站，火车才有的信息
       }
         ......
     ]
@@ -221,9 +228,11 @@ cassandra:
 ### 要添加的记录
 
 ~~~
-{"name": "zhangsan","type": "plane","airport": "首都机场", "contact": "888888", "depart": "hangzhou","credentials": "身份证", "date": "20160408", "flight": "CA1986","credentials_no": "1234567", "seat": "15F"}
-{"name": "zhangsan","type": "train","airport": "首都机场", "contact": "888888", "depart": "hangzhou","credentials": "身份证", "date": "20160408", "flight": "CA1986","credentials_no": "1234567", "seat": "15F"}
-{"name": "lisi","type": "plane","airport": "首都机场", "contact": "888888", "depart": "hangzhou","credentials": "身份证", "date": "20160408", "flight": "CA1986","credentials_no": "1234567", "seat": "15F"}
+{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
+
+{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
+
+{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
 ~~~
 
 
@@ -231,11 +240,11 @@ cassandra:
 
 **通过curl提交数据请求**
 ~~~
-curl -l -H "Content-type: application/json" -X POST -d '{"name": "zhangsan","type": "plane","airport": "首都机场", "contact": "888888", "depart": "hangzhou","credentials": "身份证", "date": "20160408", "flight": "CA1986","credentials_no": "1234567", "seat": "15F"}' http://localhost:8080/journey
+curl -l -H "Content-type: application/json" -X POST -d '{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}' http://localhost:8080/journey
 
-curl -l -H "Content-type: application/json" -X POST -d '{"name": "zhangsan","type": "train","airport": "首都机场", "contact": "888888", "depart": "hangzhou","credentials": "身份证", "date": "20160408", "flight": "CA1986","credentials_no": "1234567", "seat": "15F"}' http://localhost:8080/journey
+curl -l -H "Content-type: application/json" -X POST -d '{{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}' http://localhost:8080/journey
 
-curl -l -H "Content-type: application/json" -X POST -d '{"name": "lisi","type": "plane","airport": "首都机场", "contact": "888888", "depart": "hangzhou","credentials": "身份证", "date": "20160408", "flight": "CA1986","credentials_no": "1234567", "seat": "15F"}' http://localhost:8080/journey
+curl -l -H "Content-type: application/json" -X POST -d '{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}' http://localhost:8080/journey
 ~~~
 
 **通过kafka consumer查看数据收到**
