@@ -2,8 +2,8 @@
 ---
 ![](./structure.jpg)
 
-主要开源组件
----
+### 1 主要开源组件
+
 | 开源组件| 版本号|
 | :------------- | :------------- |
 |spring-boot|1.3.3.RELEASE|
@@ -13,8 +13,8 @@
 |spark|1.6.1|
 
 
-项目代码说明
----
+### 2 项目代码说明
+
 主要包含两个子模块
 
 ** snow **
@@ -39,18 +39,30 @@ rain目前有两个modules:
 
 rain中的modules都通过jar包的形式提供，jar包可以直接拷贝到spring-xd的环境中进行update成一个spring-xd的module.
 
-spring-xd的命令介绍
----
-spring-xd通过stream的形式来组织source/processor/sink,其中source和sink支持很多的主流的数据库系统。一个stream中必须有一个source和一个sink，可以有多个processor。常用的spring-xd命令包括下面几个：
+### 3 启动服务
+#### zookeeper
+```
+zookeeper-server-start.sh /usr/local/Cellar/kafka/0.8.2.2/libexec/config/zookeeper.properties
+```
+#### kafka
+```
+kafka-server-start.sh /usr/local/Cellar/kafka/0.8.2.2/libexec/config/server.properties
+```
+#### cassandra
+```
+cassandra -f
+```
 
-**启动spring-xd**
+#### 启动spring-xd
 
-这里因为是单机模式，使用xd-singlenode，命令如下：
+```
+xd-singlenode
 
-    xd-singlenode
+xd-shell
 
-    xd-shell
-
+```
+### 4 spring-xd的命令介绍
+spring-xd通过stream的形式来组织source/processor/sink,其中source和sink支持很多的主流的数据库系统。一个stream中必须有一个source和一个sink，可以有多个processor。
 
 **添加module**
 
@@ -60,11 +72,13 @@ spring-xd通过stream的形式来组织source/processor/sink,其中source和sink
 
 ```
 xd:>module upload --file /opt/flurry/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
+
 Successfully uploaded module 'processor:find-list'
 ```
 
 ```
 xd:>module upload --file /opt/flurry/byte2string-transformer-1.0-SNAPSHOT.jar --type processor --name byte2string
+
 Successfully uploaded module 'processor:byte2string'
 ```
 
@@ -108,7 +122,8 @@ xd:>module list
 创建流的命令如下：
 
 ~~~
-xd:>stream create test --definition "kafka --zkconnect=10.160.5.56:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=10.160.5.56" --deploy
+xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=localhost" --deploy
+
 Created and deployed new stream 'test'
 ~~~
 
