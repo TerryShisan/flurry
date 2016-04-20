@@ -76,10 +76,14 @@ spring-xd通过stream的形式来组织source/processor/sink,其中source和sink
 
 ```
 xd:>module upload --file /opt/flurry/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
+
+Successfully uploaded module 'processor:find-list'
 ```
 
 ```
 xd:>module upload --file /opt/flurry/byte2string-transformer-1.0-SNAPSHOT.jar --type processor --name byte2string
+
+Successfully uploaded module 'processor:byte2string'
 ```
 
 ```
@@ -123,6 +127,8 @@ xd:>module list
 
 ~~~
 xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=localhost" --deploy
+
+Created and deployed new stream 'test'
 ~~~
 
 演示
@@ -238,7 +244,8 @@ cassandra:
 }
 ~~~
 
-### 要添加的记录
+#### 6.3 测试数据
+
 ~~~
 {"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
 
@@ -247,7 +254,9 @@ cassandra:
 {"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
 ~~~
 
-### 验证
+
+#### 6.4 测试验证
+
 **通过curl提交数据请求**
 ~~~
 curl -l -H "Content-type: application/json" -X POST -d '{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}' http://localhost:8080/journey
@@ -257,17 +266,10 @@ curl -l -H "Content-type: application/json" -X POST -d '{{"name":"zhangsan","ID"
 curl -l -H "Content-type: application/json" -X POST -d '{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}' http://localhost:8080/journey
 ~~~
 
-**通过kafka consumer查看数据**   *如果查看多条数据，通过--max-message指定。*
-~~~
-bin/kafka-simple-consumer-shell.sh --broker-list localhost:9092 --topic test --partition 0 --max-message 1
-~~~
+**通过kafka consumer查看数据收到**
 
 **通过cqlsh查看cassandra中确实有数据**
-~~~
-use mykeyspace;
 
-SELECT * FROM mykeyspace.journey;
-~~~
 **通过curl获取数据**
 ~~~
 curl http://localhost:8080/journey
