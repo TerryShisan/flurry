@@ -67,11 +67,9 @@ xd-shell
 ### 4 spring-xd的命令介绍
 spring-xd通过stream的形式来组织source/processor/sink,其中source和sink支持很多的主流的数据库系统。一个stream中必须有一个source和一个sink，可以有多个processor。
 
-**添加module**
-进入xd-shell之后，就可以通过module的命令添加上面通过rain生成的两个jar包了。
-
+**添加module**  
+进入xd-shell之后，就可以通过module的命令添加上面通过rain生成的两个jar包了。  
 命令如下：
-
 ```
 xd:>module upload --file /opt/flurry/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
 ```
@@ -113,19 +111,14 @@ xd:>module list
                                                throughput-sampler
 ```
 
-**创建stream**
-
-将rain中的jar包添加为module之后，接着就可以创建stream了，这里我们要创建的steam的目的是从kafka中读取消息，然后送到spark-streaming中进行过滤，并将过滤结果放到cassandra数据库中的journey表中。
-
+**创建stream**  
+将rain中的jar包添加为module之后，接着就可以创建stream了，这里我们要创建的steam的目的是从kafka中读取消息，然后送到spark-streaming中进行过滤，并将过滤结果放到cassandra数据库中的journey表中。  
 创建流的命令如下：
-
 ~~~
 xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=localhost" --deploy
 ~~~
 
 ### 5 演示
----
-
 #### 组网和配置
 
 单机环境组网图和配置图如下所示：
@@ -149,7 +142,7 @@ cassandra:
 ~~~
 ### 6 REST API
 
-#### 6.1生产者API
+#### 6.1 生产者API
 
 ##### Url
 
@@ -173,7 +166,6 @@ cassandra:
   "station":""              //乘车车站，火车才有的信息
 }
 ~~~
-
 ##### Result
 ~~~
 {
@@ -183,8 +175,7 @@ cassandra:
 }
 ~~~
 
-
-#### 6.2消费者API
+#### 6.2 消费者API
 
 ##### Url
 
@@ -266,7 +257,6 @@ bin/kafka-simple-consumer-shell.sh --broker-list localhost:9092 --topic test --p
 **通过cqlsh查看cassandra中确实有数据**
 ~~~
 use mykeyspace;  
-
 SELECT * FROM mykeyspace.journey;
 ~~~
 
