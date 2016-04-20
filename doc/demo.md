@@ -64,7 +64,7 @@ xd-shell
 ### 4 spring-xd的命令介绍
 spring-xd通过stream的形式来组织source/processor/sink,其中source和sink支持很多的主流的数据库系统。一个stream中必须有一个source和一个sink，可以有多个processor。
 
-**添加module**
+#### 4.1 添加module
 
 进入xd-shell之后，就可以通过module的命令添加上面通过rain生成的两个jar包了。
 
@@ -115,7 +115,7 @@ xd:>module list
                                                throughput-sampler
 ```
 
-**创建stream**
+#### 4.2 创建stream
 
 将rain中的jar包添加为module之后，接着就可以创建stream了，这里我们要创建的steam的目的是从kafka中读取消息，然后送到spark-streaming中进行过滤，并将过滤结果放到cassandra数据库中的journey表中。
 
@@ -127,10 +127,13 @@ xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=te
 Created and deployed new stream 'test'
 ~~~
 
-演示
----
+```
+stream list
+```
 
-### 组网和配置
+### 5 演示
+
+#### 组网和配置
 
 单机环境组网图和配置图如下所示：
 
@@ -151,10 +154,9 @@ cassandra:
   address: localhost
   port: 9042
 ~~~
-### REST API
+### 6 REST API
 
-#### 生产者API
-
+#### 6.1 生产者API
 ##### Url
 
     POST  /journey
@@ -188,7 +190,7 @@ cassandra:
 ~~~
 
 
-#### 消费者API
+#### 6.2 消费者API
 
 ##### Url
 
@@ -240,7 +242,7 @@ cassandra:
 }
 ~~~
 
-### 要添加的记录
+#### 6.3 测试数据
 
 ~~~
 {"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
@@ -251,7 +253,7 @@ cassandra:
 ~~~
 
 
-### 验证
+#### 6.4 测试验证
 
 **通过curl提交数据请求**
 ~~~
