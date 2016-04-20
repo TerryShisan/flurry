@@ -1,72 +1,250 @@
-Demo演示流程拆解
+总体架构
+---
+![](./structure.jpg)
+
+主要开源组件
+---
+| 开源组件| 版本号|
+| :------------- | :------------- |
+|spring-boot|1.3.3.RELEASE|
+|spring-xd|1.3.1.RELEASE|
+|kafka|0.9.0.1|
+|cassandra|2.2.5|
+|spark|1.6.1|
+
+
+项目代码说明
+---
+主要包含两个子模块
+
+** snow **
+
+snow通过jersey对外提供REST API，对应架构图中的spring-boot部分！主要有两个数据流向，生成者API部分作为kafka producer，会将数据发给kafka brokers。消费者API部分通过Spring-data-cassandra从cassandra数据库中读取数据。
+
+snow通过jar包的方式进行部署对外提供服务。
+
+** rain **
+
+rain不是一个单独的功能模块，而是包含了很多功能模块的集合，这里存放了所有spring-xd的modules，这些modules可以直接通过update的方式插入spring-xd中作为source/processor/sink使用。
+
+rain目前有两个modules:
+
+- byte2string
+
+   byte2string将字节类型的数据转换成字符串类型。需要该组件的原因是字符spring-xd中kafka作为source的时候，output的是byte格式的数据。
+
+- find-list
+
+    find-list实际完成过滤的功能，通过用户配置关键字，find-list调用spring-xd中集成的spark-streaming，通过RDD完成数据的过滤，返回符合条件的数据集。
+
+rain中的modules都通过jar包的形式提供，jar包可以直接拷贝到spring-xd的环境中进行update成一个spring-xd的module.
+
+spring-xd的命令介绍
+---
+spring-xd通过stream的形式来组织source/processor/sink,其中source和sink支持很多的主流的数据库系统。一个stream中必须有一个source和一个sink，可以有多个processor。常用的spring-xd命令包括下面几个：
+
+**启动spring-xd**
+
+这里因为是单机模式，使用xd-singlenode，命令如下：
+
+    xd-singlenode
+
+    xd-shell
+
+
+**添加module**
+
+进入xd-shell之后，就可以通过module的命令添加上面通过rain生成的两个jar包了。
+
+命令如下：
+
+~~~
+xd:>module upload --file /Users/bj-yf/zhouhb/jar/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
+Successfully uploaded module 'processor:find-list'
+xd:>module upload --file /Users/bj-yf/zhouhb/jar/byte2string-transformer-1.0-SNAPSHOT.jar --type processor --name byte2string
+Successfully uploaded module 'processor:byte2string'
+xd:>module list
+      Source              Processor            Sink                     Job
+  ------------------  -------------------  -----------------------  -----------------
+      file                aggregator           aggregate-counter        filejdbc
+      ftp                 bridge               cassandra                filepollhdfs
+      gemfire             byte2string          counter                  ftphdfs
+      gemfire-cq          filter               field-value-counter      gpload
+      http                find-list            file                     hdfsjdbc
+      jdbc                header-enricher      ftp                      hdfsmongodb
+      jms                 http-client          gauge                    jdbchdfs
+      kafka               json-to-tuple        gemfire-json-server      sparkapp
+      mail                object-to-json       gemfire-server           sqoop
+      mongodb             script               gpfdist                  timestampfile
+      mqtt                scripts              hdfs
+      rabbit              shell                hdfs-dataset
+      reactor-ip          splitter             jdbc
+      reactor-syslog      transform            kafka
+      sftp                                     log
+      syslog-tcp                               mail
+      syslog-udp                               mongodb
+      tail                                     mqtt
+      tcp                                      null
+      tcp-client                               rabbit
+      time                                     redis
+      trigger                                  rich-gauge
+      twittersearch                            router
+      twitterstream                            shell
+                                               splunk
+                                               tcp
+                                               throughput-sampler
+~~~
+**创建stream**
+
+将rain中的jar包添加为module之后，接着就可以创建stream了，这里我们要创建的steam的目的是从kafka中读取消息，然后送到spark-streaming中进行过滤，并将过滤结果放到cassandra数据库中的journey表中。
+
+创建流的命令如下：
+
+~~~
+xd:>stream create test --definition "kafka --zkconnect=10.160.5.56:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=10.160.5.56" --deploy
+Created and deployed new stream 'test'
+~~~
+
+演示
 ---
 
-## first 3 minutes
-介绍flurry.png中的内容，也就是flurry的整体架构，图可以重新优化一下。
+### 组网和配置
 
-主要突出下面几点内容：
+单机环境组网图和配置图如下所示：
 
-1. kafka/cassandra/spark/web/spring-xd的位置和作用。
+![](./network.jpg)
 
-1. 数据流的走向和最终达成的效果说明。
+~~~
+kafka:
+  broker:
+    address: localhost:9092
+  zookeeper:
+    connect: localhost:2181
+  topic: "test"
+  messageKey:
+zookeeper:
+  host: localhost 
+  port: 2181
+cassandra:
+  address: localhost
+  port: 9042
+~~~
+### REST API
 
-## Second 1 minutes
+#### 生产者API
 
-列出用到的各种开源技术组件以及对应的版本号，用列表的形式展示。
+##### Url
 
-## Third 5 minutes
+    POST  /journey
 
-说明一下目前的代码机构，以及每个部分的作用。代码主要包含三部分：
+##### Params
+~~~
+{
+  "name":  "张三",               //必选，姓名
+  "type": "plane",              //必选，行程的类型
+  "date":  "20160411",          //必选，日期
+  "credentials":  "身份证"，     //证件类型
+  "credential_no"："1234567",         //证件号码
+  "contact":"888888",        //联系方式
+  "flight": "CA1986",        //航班号
+  "depart":  "beijing",       //出发地
+  "dest":  "hangzhou",         //目的地
+  "seat": "15F",             //座位号
+  "airport":"首都机场"        //机场信息，飞机才有的信息
+  "carriage": "",           //车厢号，火车才有的信息
+  "station":""              //乘车车站，火车才有的信息
+}
+~~~
 
-1. rain/byte-string
-1. rain/black
-1. snow
-
-强调一下上面前两个是jar包，作为processor插入到xd中，snow是一个可执行jar包，提供HTTP REST服务。
-
-说明一下打包的过程和每个包的作用以及和前面的架构图的对应关系。
-
-这边的问题可以后边进行答疑。不做过多发散。
-
-## Four 2 minutes
-简单说明一下会用到的spring-xd命令,包括：
-1. spring-xd的启动的两个命令
-2. module加载的命令
-3. stream创建删除的命令
-
-上述命令只说明一下具体的形式和完成的功能，并不实际执行，实际上环境已经准备好。
-
-## Five 10 minutes
-实际演示，应该至少包含下面几个步骤:
-  1. 介绍一下组网和配置
-  1. 开始的时候看cassandra数据库和kafka consumer,都是空的
-  1. 描述生产者和消费者REST api，说明一下要提交的消息以及实际应该出现的结果。最少应该包含三条消息的提交（张三/火车，张三/飞机， 李四/任意) ，过滤列表只过滤出张三的信息。
-  1. 通过curl提交上述描述的三条消息。
-  1. 看结果：
-    - 看kafka consumer消息证明消息已经发送出来
-    - 看casandra数据库证明消息已经经过过滤存储到数据库中
-    - 通过rest接口或者web显示结果，证明可以从casandra中读出来相关信息
-
-## Six 5 minutes
-答疑
+##### Result
+~~~
+{
+    code: 200,              //标准的http错误返回码
+    success: true,          //是否成功
+    message: "successful",  //返回值信息，可以是成功或者获取失败之后的详细信息
+}
+~~~
 
 
-需要准备的材料
----
+#### 消费者API
 
-## 演示文档
-其中包含：
-- 架构图
-- 组网图，单机可以简单标明一下端口信息
-- 所用到的技术列表和版本号
-- spring xd的两个启动命令
-- spring xd shell中管理module的命令
-- spring xd shell中管理stream的命令
-- REST API
-- 要提交的三条消息
-- curl命令
+##### Url
 
-## 环境准备
-1. 将所有环境布置到一台机器上。
-2. 比较详细的step by step的环境搭建文档。
-3. 备用环境
+    GET  /journey
+
+##### Params
+~~~
+  {
+    "type":"plane",           //出行方式，plane或者train
+    "name":"张三"，            //出行人姓名
+    "start":"2016-04-02",     //出行起始日期
+    "end":"2016-04-12",       //出行截止日期,可选，缺省等于起始日期
+    currentPage:1,            //可选，当前页，缺省为1
+    pageSize:20               //可选，每页记录数，缺省为20
+  }
+~~~
+
+##### Result
+~~~
+{
+    code: 200,              //标准的http错误返回码
+    success: true,          //是否成功
+    message: "successful",  //返回值信息，可以是成功或者获取失败之后的详细信息
+    pageInfo:
+    {
+       currentPage: 1,     //当前页
+       pageSize: 20,       //每页记录数
+       total: 500          //总记录数
+    }
+    count:  20,             //本次获取的数量
+    list:[
+      {
+        "name":  "张三",            //姓名
+        "type": "plane",           //行程的类型
+        "id":  "身份证"，           //证件类型
+        "idno"："1234567",         //证件号码
+        "contact":"888888",        //联系方式
+        "date":  "20160411",     //日期
+        "flight": "CA1986",        //航班号
+        "depart":  "beijing",       //出发地
+        "dest":  "hangzhou",         //目的地
+        "seat": "15F",             //座位号
+        "airport":"首都机场"        //机场信息，飞机才有的信息
+        "carriage": "",           //车厢号，火车才有的信息
+        "station":""              //乘车车站，火车才有的信息
+      }
+        ......
+    ]
+}
+~~~
+
+### 要添加的记录
+
+~~~
+{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
+
+{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
+
+{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
+~~~
+
+
+### 验证
+
+**通过curl提交数据请求**
+~~~
+curl -l -H "Content-type: application/json" -X POST -d '{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}' http://localhost:8080/journey
+
+curl -l -H "Content-type: application/json" -X POST -d '{{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}' http://localhost:8080/journey
+
+curl -l -H "Content-type: application/json" -X POST -d '{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}' http://localhost:8080/journey
+~~~
+
+**通过kafka consumer查看数据收到**
+
+**通过cqlsh查看cassandra中确实有数据**
+
+**通过curl获取数据**
+~~~
+curl http://localhost:8080/journey
+~~~
