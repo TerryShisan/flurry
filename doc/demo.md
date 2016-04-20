@@ -49,11 +49,13 @@ zookeeper-server-start.sh /usr/local/Cellar/kafka/0.8.2.2/libexec/config/zookeep
 kafka-server-start.sh /usr/local/Cellar/kafka/0.8.2.2/libexec/config/server.properties
 ```
 #### cassandra
+启动cassandra
 ```
 cassandra -f
-
+```
+创建keyspace以及table
+```
 create KEYSPACE mykeyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
-
 create table journey(name text, date text, type text, credentials text, credentials_no text, contact text, flight text, depart text, dest text, seat text, airport text, carriage text, station text, primary key (name,date,type)) ;
 ```
 
@@ -72,9 +74,6 @@ spring-xd通过stream的形式来组织source/processor/sink,其中source和sink
 命令如下：
 ```
 xd:>module upload --file /opt/flurry/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
-```
-
-```
 xd:>module upload --file /opt/flurry/byte2string-transformer-1.0-SNAPSHOT.jar --type processor --name byte2string
 ```
 
