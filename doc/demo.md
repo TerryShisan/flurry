@@ -55,6 +55,7 @@ cassandra -f
 ```
 创建keyspace以及table
 ```
+bin/cqlsh  
 create KEYSPACE mykeyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
 create table journey(name text, date text, type text, credentials text, credentials_no text, contact text, flight text, depart text, dest text, seat text, airport text, carriage text, station text, primary key (name,date,type)) ;
 ```
@@ -255,6 +256,7 @@ bin/kafka-simple-consumer-shell.sh --broker-list localhost:9092 --topic test --p
 
 **通过cqlsh查看cassandra中确实有数据**
 ~~~
+bin/cqlsh  
 use mykeyspace;  
 SELECT * FROM mykeyspace.journey;
 ~~~
