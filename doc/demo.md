@@ -243,7 +243,7 @@ curl -l -H "Content-type: application/json" -X POST -d '{"name":"lisi","ID":"身
 curl -l -H "Content-type: application/json" -X POST -d '{"name":"lili","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场3"}' http://localhost:8080/journey
 ~~~
 
-**通过kafka consumer查看收到的数据**  *查看消息的个数通过--max-message指定*
+**通过kafka consumer查看收到的数据**  *查看消息的个数通过`--max-message`指定*
 ~~~
 kafka-simple-consumer-shell.sh --broker-list localhost:9092 --topic test --partition 0
 ~~~
