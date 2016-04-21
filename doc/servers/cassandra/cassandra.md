@@ -77,7 +77,7 @@ There is one constraint in cassandra: any field you want to use in the where cla
 ```
 
 > 关于上面的这个问题的一个说明：
-http://www.datastax.com/dev/blog/allow-filtering-explained-2
+[http://www.datastax.com/dev/blog/allow-filtering-explained-2](http://www.datastax.com/dev/blog/allow-filtering-explained-2)
 >
 需要在select语句后面加上allow filtering属性字段。
 >

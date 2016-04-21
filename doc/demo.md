@@ -48,15 +48,36 @@ zookeeper-server-start.sh /usr/local/Cellar/kafka/0.8.2.2/libexec/config/zookeep
 ```
 kafka-server-start.sh /usr/local/Cellar/kafka/0.8.2.2/libexec/config/server.properties
 ```
+
+```
+kafka-topics.sh  --create --zookeeper localhost:2181  --replication-factor 1 --partitions 1 --topic test
+
+kafka-topics.sh --zookeeper localhost:2181 -list
+```
 #### cassandra
-启动cassandra
+##### 安装cassandra
+```
+brew install homebrew/versions/cassandra22
+```
+##### 启动cassandra
 ```
 cassandra -f
 ```
-创建keyspace以及table
+##### 创建keyspace以及table
 ```
-create KEYSPACE mykeyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
-create table journey(name text, date text, type text, credentials text, credentials_no text, contact text, flight text, depart text, dest text, seat text, airport text, carriage text, station text, primary key (name,date,type)) ;
+cqlsh localhost 9042
+```
+
+```
+cqlsh> create KEYSPACE mykeyspace WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
+```
+```
+cqlsh> use mykeyspace;
+cqlsh> create table journey(name text, date text, type text, credentials text, credentials_no text, contact text, flight text, depart text, dest text, seat text, airport text, carriage text, station text, primary key (name,date,type));
+```
+
+```
+cqlsh> SELECT * FROM mykeyspace.journey;
 ```
 
 #### 启动spring-xd
@@ -79,42 +100,16 @@ xd:>module upload --file /opt/flurry/byte2string-transformer-1.0-SNAPSHOT.jar --
 
 ```
 xd:>module list
-      Source              Processor            Sink                     Job
-  ------------------  -------------------  -----------------------  -----------------
-      file                aggregator           aggregate-counter        filejdbc
-      ftp                 bridge               cassandra                filepollhdfs
-      gemfire             byte2string          counter                  ftphdfs
-      gemfire-cq          filter               field-value-counter      gpload
-      http                find-list            file                     hdfsjdbc
-      jdbc                header-enricher      ftp                      hdfsmongodb
-      jms                 http-client          gauge                    jdbchdfs
-      kafka               json-to-tuple        gemfire-json-server      sparkapp
-      mail                object-to-json       gemfire-server           sqoop
-      mongodb             script               gpfdist                  timestampfile
-      mqtt                scripts              hdfs
-      rabbit              shell                hdfs-dataset
-      reactor-ip          splitter             jdbc
-      reactor-syslog      transform            kafka
-      sftp                                     log
-      syslog-tcp                               mail
-      syslog-udp                               mongodb
-      tail                                     mqtt
-      tcp                                      null
-      tcp-client                               rabbit
-      time                                     redis
-      trigger                                  rich-gauge
-      twittersearch                            router
-      twitterstream                            shell
-                                               splunk
-                                               tcp
-                                               throughput-sampler
+
 ```
 
 **创建stream**  
 将rain中的jar包添加为module之后，接着就可以创建stream了，这里我们要创建的steam的目的是从kafka中读取消息，然后送到spark-streaming中进行过滤，并将过滤结果放到cassandra数据库中的journey表中。  
 创建流的命令如下：
 ~~~
-xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=localhost" --deploy
+xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test | byte2string | find-list --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=127.0.0.1" --deploy
+
+xd:>stream list
 ~~~
 
 ### 5 演示
@@ -229,11 +224,11 @@ cassandra:
 #### 6.3 测试数据
 
 ~~~
-{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
+{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
 
-{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
+{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
 
-{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
+{"name":"lili","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}
 ~~~
 
 
@@ -241,16 +236,16 @@ cassandra:
 
 **通过curl提交数据请求**
 ~~~
-curl -l -H "Content-type: application/json" -X POST -d '{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}' http://localhost:8080/journey
+curl -l -H "Content-type: application/json" -X POST -d '{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场1"}' http://localhost:8080/journey
 
-curl -l -H "Content-type: application/json" -X POST -d '{{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}' http://localhost:8080/journey
+curl -l -H "Content-type: application/json" -X POST -d '{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场2"}' http://localhost:8080/journey
 
-curl -l -H "Content-type: application/json" -X POST -d '{"name":"lisi","ID":"身份证","IDNo":"1234567","contact":"888888","date":"2016-04-11","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场"}' http://localhost:8080/journey
+curl -l -H "Content-type: application/json" -X POST -d '{"name":"lili","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"train","airport":"首都机场3"}' http://localhost:8080/journey
 ~~~
 
 **通过kafka consumer查看收到的数据**  *查看消息的个数通过--max-message指定*
 ~~~
-bin/kafka-simple-consumer-shell.sh --broker-list localhost:9092 --topic test --partition 0 --max-message 1
+kafka-simple-consumer-shell.sh --broker-list localhost:9092 --topic test --partition 0
 ~~~
 
 **通过cqlsh查看cassandra中确实有数据**

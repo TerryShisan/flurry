@@ -135,8 +135,8 @@
                     <artifactId>spring-data-cassandra</artifactId>
                 </exclusion>
                 <!--<exclusion>-->
-                    <!--<groupId>org.springframework.integration</groupId>-->
-                    <!--<artifactId>spring-integration-core</artifactId>-->
+                <!--<groupId>org.springframework.integration</groupId>-->
+                <!--<artifactId>spring-integration-core</artifactId>-->
                 <!--</exclusion>-->
             </exclusions>
         </dependency>

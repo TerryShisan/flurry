@@ -7,29 +7,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.xd.spark.streaming.SparkConfig;
 import org.springframework.xd.spark.streaming.java.Processor;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @SuppressWarnings({"serial"})
 public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream<String>> {
     List<String> blackList = Arrays.asList("zhangsan", "lisi");
     public static final String fileName = "/opt/tmp/blacklist.txt";
-
+    public static final List<String> listAllName = new ArrayList<>();
     @Value("${blackName}")
     private String blackName;
-
-
     @Value("${listFileName}")
     private String blackFileName;
-
 
     @Override
     /**
@@ -39,29 +36,28 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
     public JavaDStream<String> process(JavaDStream<String> input) {
         List<String> list = getBlackList();
         JavaDStream<String> ret = input.filter((Function<String, Boolean>) s -> {
+            System.out.println("process::filter >> " + s);
             boolean isBlack = false;
-            for (int i = 0; i < list.size(); i++) {
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
                 if (s.contains(list.get(i))) {
                     isBlack = true;
                     break;
                 }
             }
+            System.out.println("process:: Black-List size=" + size);
+            System.out.println("process:: isBlack?" + isBlack);
             return isBlack;
         });
-
         return ret;
     }
 
     public List<String> getBlackList() {
         List<String> listAllName = new ArrayList<>();
-
         /**
          * 解析参数中的黑名单
          */
-        List<String> listByName = null;
-        if (!blackName.isEmpty()) {
-            listByName = Arrays.asList(blackName.split(","));
-        }
+        List<String> listByName = Arrays.asList(blackName.split(","));
         if (listByName != null) {
             listAllName.addAll(listByName);
         }
@@ -76,22 +72,20 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
         return listAllName;
     }
 
-
-
     private List<String> getBlackListByFileName() {
         List<String> list = null;
-        Path path = Paths.get(blackFileName);
-        try {
-            BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-            char[] content = new char[(int) Files.size(path)];
-            reader.read(content);
-            String con = new String(content);
-            list = Arrays.asList(con.replace("\r", "").split("\n"));
-            reader.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (blackFileName != null && !blackFileName.isEmpty()) {
+            Path path = Paths.get(blackFileName);
+            try {
+                BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+                char[] content = new char[(int) Files.size(path)];
+                reader.read(content);
+                String con = new String(content);
+                list = Arrays.asList(con.replace("\r", "").split("\n"));
+                reader.close();
+            } catch (IOException ignored) {
+            }
         }
-
         return list;
     }
 
@@ -102,7 +96,6 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
         // These properties always get the highest precedence
 //        props.setProperty("spark.driver.allowMultipleContexts","true");
         props.setProperty(SPARK_MASTER_URL_PROP, "local[4]");
-
         return props;
     }
 }

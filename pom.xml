@@ -25,6 +25,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hadoop.version>2.6.0</hadoop.version>
         <junit.version>4.12</junit.version>
+        <jettison.version>1.3.3</jettison.version>
     </properties>
 
     <repositories>
