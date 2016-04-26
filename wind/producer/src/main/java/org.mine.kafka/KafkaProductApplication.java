@@ -1,4 +1,4 @@
-package com.mine.kafka;
+package org.mine.kafka;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
