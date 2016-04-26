@@ -16,7 +16,7 @@ https://github.com/spring-cloud/spring-cloud-dataflow-admin-cloudfoundry[Cloud F
 https://github.com/spring-cloud/spring-cloud-dataflow-admin-mesos[Mesos]
 https://github.com/spring-cloud/spring-cloud-dataflow-admin-kubernetes[Kubernetes]
 ```
-已local模式为例:
+以local模式为例:
 ```
 redis-server
 java -jar spring-cloud-dataflow-admin-local-1.0.0.M2.jar
@@ -30,8 +30,8 @@ Data Flow运行**依赖于redis或者kafka**
 >By adding @EnableBinding to your main application, you get immediate connectivity to a message broker and by adding @StreamListener to a method, you will receive events for stream processing.    
 
 ### Spring Cloud  Stream modules
-使用Stream架构所构建的消息驱动的数据微服务。这些微服务通过两个重要的信息关联
-1. binder 微服务间的消息订阅系统，可以是kafka、redis等，这是Data Flow依赖于他们的原因。有数据关联的微服务应使用相同的binder。下面例子中两个微服务使用的binder是kafa。
+使用Stream架构所构建的消息驱动的数据微服务。这些微服务通过两个重要的信息关联  
+1. binder 微服务间的消息订阅系统，可以是kafka、redis等，这是Data Flow依赖于他们的原因。有数据关联的微服务应使用相同的binder。下面例子中两个微服务使用的binder是kafa。  
 2. destination  微服务间的输入输出标记，如果一个微服务的输入是另一个微服务的输出那么他们的destination应相同。下面的列子中两个微服务的destination是ktest。
 ```
 java -jar kafka-product-1.0-SNAPSHOT.jar  --spring.cloud.stream.bindings.output.binder=kafka --spring.cloud.stream.bindings.output.destination=ktest
