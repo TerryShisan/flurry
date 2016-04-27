@@ -29,7 +29,7 @@ Data Flow运行**依赖于redis或者kafka**
 为消息驱动的微服务提供架构，其基于Spring Boot、 Spring Integration。
 >By adding @EnableBinding to your main application, you get immediate connectivity to a message broker and by adding @StreamListener to a method, you will receive events for stream processing.    
 
-### Spring Cloud  Stream modules
+### Spring Cloud Stream modules
 使用Stream架构所构建的消息驱动的数据微服务。这些微服务通过两个重要的信息关联  
 1. binder 微服务间的消息订阅系统，可以是kafka、redis等，这是Data Flow依赖于他们的原因。有数据关联的微服务应使用相同的binder。下面例子中两个微服务使用的binder是kafa。  
 2. destination  微服务间的输入输出标记，如果一个微服务的输入是另一个微服务的输出那么他们的destination应相同。下面的列子中两个微服务的destination是ktest。
@@ -37,7 +37,7 @@ Data Flow运行**依赖于redis或者kafka**
 java -jar producer-1.0-SNAPSHOT.jar  --spring.cloud.stream.bindings.output.binder=kafka --spring.cloud.stream.bindings.output.destination=ktest
 java -jar cassandra-sink-1.0-SNAPSHOT.jar --spring.cloud.stream.bindings.input.binder=kafka --spring.cloud.stream.bindings.input.destination=ktest --ingestQuery='insert into te(time) values(?)' --keyspace=mykeyspace --contactPoints=127.0.0.1 --server.port=8801
 ```
-
+kafka作为binder可以指定broker、port等配置，详见http://docs.spring.io/spring-cloud-stream/docs/current-SNAPSHOT/reference/htmlsingle/。
 ## 实践
 ![](./dataflow.png)  
 producer每秒产生一个字符串，通过binder交给kafka。producer和cassandra-sink通过ktest做输入输出的关联。  
