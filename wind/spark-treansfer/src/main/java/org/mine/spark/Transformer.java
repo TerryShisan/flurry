@@ -58,6 +58,10 @@ public class Transformer {
 
     @ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
     public String transform(String payload) {
+
+        if(payload.isEmpty()){
+            return null;
+        }
         List<String> list = getBlackList();
         JavaRDD<String> words = jsc.parallelize(Arrays.asList(payload.split(" ")));
 

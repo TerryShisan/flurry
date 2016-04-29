@@ -76,6 +76,7 @@ cqlsh:mykeyspace>SELECT * FROM mykeyspace.journey;
 ```
 
 ### Demo2
+专注性能调优，使用producer直接输入。
 producer每秒产生一个字符串，通过binder交给kafka。producer和cassandra-sink通过ktest做输入输出的关联。  
 #### producer输出
 ```
