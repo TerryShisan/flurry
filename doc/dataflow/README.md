@@ -41,14 +41,49 @@ java -jar cassandra-sink-1.0-SNAPSHOT.jar --spring.cloud.stream.bindings.input.b
 kafka作为binder可以指定broker、port等配置，详见http://docs.spring.io/spring-cloud-stream/docs/current-SNAPSHOT/reference/htmlsingle/。
 ## 实践
 ![](./dataflow.png)  
+
+### Demo1
+#### 启动
+1. 启动zk、kafka、cassandra
+1. 启动Snow，其接收的数据写入到Kafka中，Topic=test。
+1. 启动spark-transfer微服务
+```
+java -jar spark-transfer-1.0-SNAPSHOT.jar
+```
+1. 启动cassandra-sink
+```
+java -jar cassandra-sink-1.0-SNAPSHOT.jar --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=127.0.0.1
+```
+#### 构造输入
+```
+{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
+```
+#### 检测
+spark-transfer输出
+```
+ Find: {"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
+```
+cassandra-sink输出
+```
+received: {"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
+```
+数据库检测
+```
+cqlsh:mykeyspace>SELECT * FROM mykeyspace.journey;
+ name     | date     | type  | airport  | carriage | contact | credentials | credentials_no | depart | dest | flight | seat | station
+----------+----------+-------+----------+----------+---------+-------------+----------------+--------+------+--------+------+---------
+ zhangsan | 20160411 | plane | 首都机场 |     null |  888888 |        null |           null |   null | null | CA1986 |  15F |    null
+```
+
+### Demo2
 producer每秒产生一个字符串，通过binder交给kafka。producer和cassandra-sink通过ktest做输入输出的关联。  
-### producer输出
+#### producer输出
 ```
 {"time":"zhangsan Tue Apr 26 08:48:03 PDT 2016"}
 {"time":"zhangsan Tue Apr 26 08:48:04 PDT 2016"}
 {"time":"zhangsan Tue Apr 26 08:48:05 PDT 2016"}
 ```
-### kafka检测
+#### kafka检测
 检测命令
 ```
 bin/kafka-simple-consumer-shell.sh --broker-list localhost:9092 --topic ktest --partition 0  
@@ -62,7 +97,7 @@ ontentType
 ontentType
           "text/plain"{"time":"zhangsan Tue Apr 26 08:46:20 PDT 2016"}
 ```
-### cassandra检查
+#### cassandra检查
 检查命令
 ```
 cqlsh:mykeyspace> select * from te;
