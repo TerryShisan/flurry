@@ -1,18 +1,21 @@
-# flurry
-realtime calculating
+# Flurry
+Real time Calculating Platform
 
 ![](doc/flurry.png)
 
-## module
+## 1 module
 ### snow
-restful service to receive and process input, and represent the data
+A restful service by using spring boot, for receiving and processing real time input, also, for representing data.
 
 ### rain
-core real time algorithm to process the data
+Core real time algorithm for processing data above spring xd.
 
-## quick start
+### wind
+Core real time algorithm for processing data by using spring cloud dataflow.
+
+## 2 quick start
 ![](doc/demo.png)
-### 1 启动服务
+### 1 Start Services
 #### zookeeper
 ```
 zookeeper-server-start.sh /usr/local/Cellar/kafka/0.8.2.2/libexec/config/zookeeper.properties
@@ -30,7 +33,12 @@ cassandra -f
 xd-singlenode
 
 ```
-### 2 启动客户端
+#### rabbitmq
+```
+TODO
+```
+
+### 2 Start Clients
 #### cassandra
 ```
 cqlsh localhost 9042
