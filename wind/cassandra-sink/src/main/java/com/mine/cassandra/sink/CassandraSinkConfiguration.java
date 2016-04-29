@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.mine.cassandra.CassandraConfiguration;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cassandra.core.WriteOptions;
@@ -58,6 +60,8 @@ import java.util.regex.Pattern;
 @EnableBinding(Sink.class)
 @EnableConfigurationProperties(CassandraSinkProperties.class)
 public class CassandraSinkConfiguration {
+
+    private static Logger logger = LoggerFactory.getLogger(CassandraSinkConfiguration.class);
 
     @Autowired
     private CassandraSinkProperties cassandraSinkProperties;
@@ -156,6 +160,9 @@ public class CassandraSinkConfiguration {
         @Override
         @SuppressWarnings("unchecked")
         protected List<List<Object>> transformPayload(Object payload) throws Exception {
+
+            logger.warn("received: " + payload);
+
             if (payload instanceof List) {
                 return (List<List<Object>>) payload;
             } else {
