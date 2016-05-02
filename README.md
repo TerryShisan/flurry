@@ -31,11 +31,10 @@ cassandra -f
 #### spring-xd(include spark lib)
 ```
 xd-singlenode
-
 ```
 #### rabbitmq
 ```
-TODO
+rabbitmq-server –detached
 ```
 
 ### 2 Start Clients
@@ -47,7 +46,6 @@ cqlsh localhost 9042
 #### spring-xd
 ```
 xd-shell
-
 ```
 
 #### xd moduls
