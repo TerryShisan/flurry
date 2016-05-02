@@ -34,6 +34,7 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
      * 返回值为false时过滤
      */
     public JavaDStream<String> process(JavaDStream<String> input) {
+        System.out.println("Spark Process received: "+ input);
         List<String> list = getBlackList();
         JavaDStream<String> ret = input.filter((Function<String, Boolean>) s -> {
             System.out.println("process::filter >> " + s);
@@ -74,6 +75,7 @@ public class FindBlackList implements Processor<JavaDStream<String>, JavaDStream
 
     private List<String> getBlackListByFileName() {
         List<String> list = null;
+        System.out.println("get File :"+ blackFileName);
         if (blackFileName != null && !blackFileName.isEmpty()) {
             Path path = Paths.get(blackFileName);
             try {
