@@ -55,7 +55,9 @@ java -jar spark-transfer-1.0-SNAPSHOT.jar
 java -jar cassandra-sink-1.0-SNAPSHOT.jar --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=127.0.0.1
 ```
 #### 构造输入
+可以通过snow构造，也可以通过kafka直接构造，例如
 ```
+bin/kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic test
 {"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
 ```
 #### 检测
