@@ -37,7 +37,7 @@ xd-singlenode
 rabbitmq-server –detached
 ```
 
-### 2 Start Clients
+### 2 Start Clients for Spring XD Architecture
 #### cassandra
 ```
 cqlsh localhost 9042
@@ -95,4 +95,18 @@ SELECT * FROM mykeyspace.journey;
 curl http://localhost:8080/journey
 ```
 
-## [quick start details](doc/demo.md)
+### 3 Start Clients for Spring Cloud Data Flow Architecture
+#### 1 run application
+The application receives data streaming from Kafak by Topic Name 'test', and sends data streaming to RabbitMQ.
+```
+java -jar target/spark-transfer-1.0-SNAPSHOT.jar
+```
+#### 2 test
+```
+bin/kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic test
+{"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
+```
+#### 3 verif
+http://127.0.0.1:15672/#/exchanges
+
+## [quick start details](doc/demo.md)  
