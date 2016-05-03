@@ -10,7 +10,7 @@
 |spring-xd|1.3.1.RELEASE|
 |kafka|0.9.0.1|
 |cassandra|2.2.5|
-|spark|1.6.1|
+|spark|1.4.1|
 
 
 ### 2 项目代码说明
@@ -107,7 +107,7 @@ xd:>module list
 将rain中的jar包添加为module之后，接着就可以创建stream了，这里我们要创建的steam的目的是从kafka中读取消息，然后送到spark-streaming中进行过滤，并将过滤结果放到cassandra数据库中的journey表中。  
 创建流的命令如下：
 ~~~
-xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test --outputType=text/plain | find-list   --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=127.0.0.1" --deploy
+xd:>stream create test --definition "kafka --zkconnect=localhost:2181 --topic=test --outputType=text/plain | find-list  --blackName='zhangsan,lili' | cassandra --ingestQuery='insert into journey(name, date, type, credentials, credentials_no, contact, flight, depart, dest, seat, airport, carriage, station) values(?,?,?,?,?,?,?,?,?,?,?,?,?)' --keyspace=mykeyspace --contactPoints=127.0.0.1" --deploy
 
 xd:>stream list
 ~~~

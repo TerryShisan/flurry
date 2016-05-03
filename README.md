@@ -106,7 +106,7 @@ java -jar target/spark-transfer-1.0-SNAPSHOT.jar
 bin/kafka-console-producer.sh --broker-list 127.0.0.1:9092 --topic test
 {"name":"zhangsan","ID":"身份证","IDNo":"1234567","contact":"888888","date":"20160411","flight":"CA1986","from":"beijing","to":"hangzhou","seat": "15F","type":"plane","airport":"首都机场"}
 ```
-#### 3 verif
-http://127.0.0.1:15672/#/exchanges
+#### 3 verify
+Check exchange in http://127.0.0.1:15672/#/exchanges  
 
 ## [quick start details](doc/demo.md)  
