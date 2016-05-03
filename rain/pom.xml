@@ -12,7 +12,6 @@
     <artifactId>rain</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>byte2string-transformer</module>
         <module>find-list-processor</module>
     </modules>
 </project>

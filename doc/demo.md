@@ -29,7 +29,7 @@ rain不是一个单独的功能模块，而是包含了很多功能模块的集�
 
 rain目前有两个modules:
 
-- byte2string
+- byte2string(已废弃，待删除)
 
    byte2string将字节类型的数据转换成字符串类型。需要该组件的原因是字符spring-xd中kafka作为source的时候，output的是byte格式的数据。
 
@@ -95,7 +95,6 @@ spring-xd通过stream的形式来组织source/processor/sink,其中source和sink
 命令如下：
 ```
 xd:>module upload --file /opt/flurry/find-list-processor-1.0-SNAPSHOT.jar --type processor --name find-list
-xd:>module upload --file /opt/flurry/byte2string-transformer-1.0-SNAPSHOT.jar --type processor --name byte2string
 ```
 
 ```
