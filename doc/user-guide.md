@@ -125,13 +125,13 @@ Windows用户可以下载最新的.zip文件，解压，安装到文件夹，然
 
 >	 You can then use the admin config server <url> to attempt to reconnect to the admin REST endpoint once you’ve figured out what went wrong:
 
->~~~
+~~~
 admin config server http://localhost:9393
 ~~~
 
 如果本地在配置kafka的时候已经启动了zookeeper，所以这里需要把zookeeper的地址修改为实际的地址。修改下面的文件即可：
 
->~~~    
+~~~
 xd/config/servers.yml:
 #Zookeeper properties
 #client connect string: host1:port1,host2:port2,...,hostN:portN
