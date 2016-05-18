@@ -14,7 +14,7 @@
     <modules>
         <module>cassandra-sink</module>
         <module>producer</module>
-        <module>spark-treansfer</module>
+        <module>spark-transfer</module>
     </modules>
 
 
