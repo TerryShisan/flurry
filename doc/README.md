@@ -1,4 +1,4 @@
 - doc目录用于记录flurry主要原理、流程、开发计划等信息
 - servers目录记录底层依赖的各种服务器软件的运维和配置信息
-- streaming目录记录spark流或者实时流相关信息
+- streaming目录记录spark流或者实时流相关信息  
 - xd和dataflow与spring项目对应
